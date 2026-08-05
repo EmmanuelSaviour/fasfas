@@ -1,16 +1,126 @@
 # React + Vite
+# 🌱 FasFas
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> **Keep Moving. Keep Growing.**
 
-Currently, two official plugins are available:
+FasFas is a platform that rewards consistency through movement. Every verified run helps users grow their Consistency Tree, build streaks, earn ranks, and become part of a community that values showing up every day.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+# 🌍 Vision
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+To build the world's most motivating consistency platform, where movement creates discipline and discipline transforms lives.
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+# 🎯 Mission
+
+To inspire people to stay active by rewarding consistency rather than perfection, creating a community where every verified run contributes to personal growth.
+
+---
+
+# 🏃 Core Features
+
+- 🌱 Consistency Tree
+- 🔥 Daily Streak Tracking
+- 🏅 Rank Progression
+- 📍 GPS Run Verification
+- 🌳 Community Forest
+- 🏆 Leaderboards
+- 👤 User Profiles
+
+---
+
+# 🏅 Rank System
+
+| Rank | Successful Runs |
+|------|----------------:|
+| 🌱 Chaser | 0–9 |
+| 🌿 Runner | 10–19 |
+| 🌳 Tracker | 20–39 |
+| 🌳✨ Stubborn | 40+ |
+
+---
+
+# 🛠️ Tech Stack
+
+- React
+- Vite
+- Tailwind CSS
+- Git
+- GitHub
+
+Future:
+
+- Node.js
+- Express
+- PostgreSQL
+- React Router
+- JWT Authentication
+- GPS APIs
+
+---
+
+# 📂 Project Structure
+
+```text
+src/
+├── assets/
+├── components/
+│   ├── layout/
+│   ├── sections/
+│   └── ui/
+├── pages/
+├── App.jsx
+├── main.jsx
+└── index.css
+```
+
+---
+
+# 🚀 Current Progress
+
+## ✅ Sprint 1
+
+- Project Setup
+- Hero
+- Features
+- Rank Journey
+- How It Works
+- Community Forest
+- UI Library
+- Git & GitHub
+
+## 🚧 Sprint 2
+
+- Landing Page Polish
+- Footer
+- Responsive Design
+- React Router
+- Animations
+
+---
+
+# 🤝 Contributing
+
+We welcome contributors who believe in the FasFas mission.
+
+Before building a feature, ask:
+
+> **Does this help people become more consistent?**
+
+If the answer is no, rethink the feature.
+
+---
+
+# 📜 Motto
+
+> **Keep Moving. Keep Growing.**
+
+Every step matters.
+Every run counts.
+Every tree tells a story.
+
+---
+
+Built with ❤️ by Emmanuel Abang.

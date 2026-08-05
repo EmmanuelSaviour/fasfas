@@ -1,3 +1,4 @@
+import SectionTitle from "../ui/SectionTitle";
 function Features() {
   const features = [
     {
@@ -30,23 +31,16 @@ function Features() {
     <section className="bg-white py-20">
       <div className="max-w-7xl mx-auto px-6">
 
-        <div className="text-center mb-14">
-          <h2 className="text-4xl font-bold text-gray-900">
-            Why FasFas?
-          </h2>
-
-          <p className="mt-4 text-gray-600 max-w-2xl mx-auto">
-            FasFas is more than a running app. It is a platform that rewards
-            consistency and helps people build lasting discipline through
-            movement.
-          </p>
-        </div>
+       <SectionTitle
+       title="Why FasFas?"
+       subtitle="FasFas is more than a running app. It rewards consistency and helps people build lasting discipline through movement."
+       />
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="bg-gray-50 rounded-2xl p-8 shadow-sm hover:shadow-lg transition"
+              className="bg-gray-50 rounded-2xl p-8 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
             >
               <div className="text-5xl mb-5">{feature.icon}</div>
 

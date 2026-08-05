@@ -1,3 +1,4 @@
+import SectionTitle from "../ui/SectionTitle";
 function RankJourney() {
   const ranks = [
     {
@@ -30,15 +31,10 @@ function RankJourney() {
     <section className="py-20 bg-gray-100">
       <div className="max-w-7xl mx-auto px-6">
 
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-900">
-            Your Journey
-          </h2>
-
-          <p className="mt-4 text-gray-600">
-            Every verified run moves you one step closer to your next rank.
-          </p>
-        </div>
+        <SectionTitle
+        title="Your Journey"
+        subtitle="Every verified run moves you one step closer to your next rank."
+        />
 
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {ranks.map((rank) => (
