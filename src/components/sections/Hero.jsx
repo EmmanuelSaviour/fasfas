@@ -1,43 +1,72 @@
+import { Link } from "react-router-dom";
 import TreeCard from "../ui/TreeCard";
-import Button from "../ui/Button";
+
 function Hero() {
   return (
-    <section className="bg-gradient-to-br from-emerald-600 via-emerald-500 to-blue-600 text-white min-h-[90vh] flex items-center">
-      <div className="max-w-7xl mx-auto px-6 grid lg:grid-cols-2 gap-16 items-center">
+    <section className="bg-gradient-to-br from-emerald-600 via-emerald-500 to-emerald-700 px-4 py-12 text-white sm:px-6 sm:py-16 md:py-20">
+      <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-2 lg:gap-10">
 
-        {/* Left Side */}
-        <div>
-          <h1 className="text-6xl font-extrabold leading-tight">
+        {/* ================= Left Side ================= */}
+
+        <div className="min-w-0">
+
+          <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl md:text-6xl">
             Keep Moving.
             <br />
             Keep Growing.
           </h1>
 
-          <p className="mt-6 text-xl max-w-2xl text-emerald-100">
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-emerald-100 sm:text-lg md:text-xl">
             FasFas rewards consistency, not perfection.
             Every verified run helps your Consistency Tree grow.
           </p>
 
-          <div className="mt-10 flex gap-4">
-            <button className="bg-white text-emerald-600 px-6 py-3 rounded-xl font-semibold shadow-lg hover:scale-105 transition duration-300">
-              Start Your Journey
-            </button>
+          {/* ================= Buttons ================= */}
 
-            <button className="border-2 border-white px-6 py-3 rounded-xl font-semibold hover:bg-white hover:text-emerald-600 transition duration-300">
+          <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
+
+            <Link
+              to="/register"
+              className="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3 text-center font-semibold text-emerald-700 shadow-lg transition duration-300 hover:scale-105"
+            >
+              🌱 Plant Your Tree
+            </Link>
+
+            <Link
+              to="/about"
+              className="inline-flex items-center justify-center rounded-xl border-2 border-white px-6 py-3 text-center font-semibold transition duration-300 hover:bg-white hover:text-emerald-700"
+            >
               Learn More
-            </button>
+            </Link>
+
           </div>
 
-          <div className="mt-12 flex flex-wrap gap-6 text-lg">
-            <span>🏃 Reward Every Run</span>
-            <span>🔥 Build Streaks</span>
-            <span>🌳 Grow Your Tree</span>
+          {/* ================= Highlights ================= */}
+
+          <div className="mt-8 grid grid-cols-1 gap-3 text-base text-emerald-100 sm:grid-cols-2 lg:flex lg:flex-wrap lg:gap-x-8 lg:gap-y-3">
+
+            <div className="flex items-center gap-2">
+              <span>🏃</span>
+              <span>Reward Every Run</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span>🔥</span>
+              <span>Build Streaks</span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span>🌳</span>
+              <span>Grow Your Tree</span>
+            </div>
+
           </div>
+
         </div>
 
- 
-        {/* Right Side */}
-        <div className="flex justify-center">
+        {/* ================= Right Side ================= */}
+
+        <div className="flex w-full justify-center lg:justify-end">
           <TreeCard />
         </div>
 

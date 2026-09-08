@@ -29,33 +29,41 @@ function HowItWorks() {
   ];
 
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="bg-white px-4 py-14 sm:px-6 sm:py-16 md:py-20">
+      <div className="mx-auto max-w-7xl">
+
+        {/* ================= Section Title ================= */}
 
         <SectionTitle
           title="How It Works"
           subtitle="Four simple steps. One life-changing habit."
         />
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+        {/* ================= Steps ================= */}
+
+        <div className="mt-10 grid gap-5 sm:mt-12 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4 lg:gap-8">
+
           {steps.map((step) => (
             <div
               key={step.title}
-              className="relative bg-gray-50 rounded-2xl p-8 shadow-sm hover:shadow-xl transition"
+              className="relative rounded-2xl bg-gray-50 p-6 shadow-sm transition-all duration-300 hover:-translate-y-2 hover:shadow-xl sm:p-7 lg:p-8"
             >
-              <div className="text-5xl mb-5">
+
+              <div className="mb-4 text-5xl sm:mb-5">
                 {step.icon}
               </div>
 
-              <h3 className="text-2xl font-bold mb-3">
+              <h3 className="mb-3 text-xl font-bold sm:text-2xl">
                 {step.title}
               </h3>
 
-              <p className="text-gray-600">
+              <p className="text-sm leading-relaxed text-gray-600 sm:text-base">
                 {step.description}
               </p>
+
             </div>
           ))}
+
         </div>
 
       </div>

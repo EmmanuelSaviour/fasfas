@@ -1,0 +1,38 @@
+export const RANKS = [
+  {
+    id: "chaser",
+    name: "Chaser",
+    runs: "0–9 Runs",
+    tree: "chaser-tree.svg",
+    badge: "chaser.svg",
+    color: "#2DBA4E",
+    meaning: "You had the courage to begin.",
+  },
+  {
+    id: "runner",
+    name: "Runner",
+    runs: "10–19 Runs",
+    tree: "runner-tree.svg",
+    badge: "runner.svg",
+    color: "#1F8A4C",
+    meaning: "You're building consistency.",
+  },
+  {
+    id: "tracker",
+    name: "Tracker",
+    runs: "20–39 Runs",
+    tree: "tracker-tree.svg",
+    badge: "tracker.svg",
+    color: "#0B6E3A",
+    meaning: "Consistency has become your strength.",
+  },
+  {
+    id: "stubborn",
+    name: "Stubborn",
+    runs: "40+ Runs",
+    tree: "stubborn-tree.svg",
+    badge: "stubborn.svg",
+    color: "#F4B400",
+    meaning: "You refused to quit.",
+  },
+];
