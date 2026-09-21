@@ -187,6 +187,77 @@ export function AuthProvider({
 
   /*
    * ================================
+   * Update Profile
+   * ================================
+   */
+
+  const updateProfile = async ({
+    name,
+    avatar,
+    communityVisible,
+  }) => {
+    if (!user?.id) {
+      throw new Error(
+        "No authenticated user found."
+      );
+    }
+
+    const response =
+      await fetch(
+        `${API_URL}/api/users/${user.id}/profile`,
+        {
+          method: "PATCH",
+
+          headers: {
+            "Content-Type":
+              "application/json",
+          },
+
+          body: JSON.stringify({
+            name,
+            avatar,
+            communityVisible,
+          }),
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+      throw new Error(
+        data.message ||
+          "Unable to update profile."
+      );
+    }
+
+    /*
+     * Update React state.
+     */
+
+    setUser(data.user);
+
+    /*
+     * Update stored user so
+     * the changes remain after
+     * refreshing the page.
+     */
+
+    localStorage.setItem(
+      "fasfas_user",
+      JSON.stringify(
+        data.user
+      )
+    );
+
+    return data.user;
+  };
+
+  /*
+   * ================================
    * Logout
    * ================================
    */
@@ -245,6 +316,7 @@ export function AuthProvider({
         isAuthenticated,
         register,
         login,
+        updateProfile,
         logout,
       }}
     >

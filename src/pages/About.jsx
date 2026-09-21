@@ -1,8 +1,12 @@
 import { Link } from "react-router-dom";
+import Navbar from "../components/layout/Navbar";
 
 function About() {
   return (
     <main className="min-h-screen bg-white">
+
+      {/* Navigation */}
+      <Navbar />
 
       {/* Hero */}
       <section className="bg-gradient-to-br from-emerald-600 via-emerald-500 to-blue-600 px-6 py-24 text-white">
