@@ -1,7 +1,87 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
 
 function Contact() {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+
+  const [sending, setSending] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
+  const handleChange = (event) => {
+    const { id, value } = event.target;
+
+    setForm((current) => ({
+      ...current,
+      [id]: value,
+    }));
+
+    setSuccess("");
+    setError("");
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    setSuccess("");
+    setError("");
+
+    const name = form.name.trim();
+    const email = form.email.trim();
+    const message = form.message.trim();
+
+    if (!name || !email || !message) {
+      setError("Please complete all fields before sending.");
+      return;
+    }
+
+    setSending(true);
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(
+          data.message || "Unable to send your message right now."
+        );
+      }
+
+      setForm({
+        name: "",
+        email: "",
+        message: "",
+      });
+
+      setSuccess("Your message has been sent successfully.");
+    } catch (submitError) {
+      console.error("CONTACT FORM ERROR:", submitError);
+
+      setError(
+        submitError.message ||
+          "Unable to send your message right now."
+      );
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-white">
 
@@ -46,8 +126,8 @@ function Contact() {
             </h2>
 
             <p className="mt-6 text-lg leading-relaxed text-gray-600">
-              Whether you're curious about FasFas, have feedback about
-              the platform, or simply want to share an idea, reach out.
+              Have a question, complaint, technical issue, or feedback about
+              FasFas? Reach out to us and we'll be happy to help.
             </p>
 
             <div className="mt-10 space-y-6">
@@ -59,12 +139,15 @@ function Contact() {
 
                 <div>
                   <h3 className="font-bold text-gray-900">
-                    Email
+                    Support & Contact
                   </h3>
 
-                  <p className="mt-1 text-gray-600">
-                    hello@fasfas.com
-                  </p>
+                  <a
+                    href="mailto:fasfasrunning@gmail.com"
+                    className="mt-1 inline-block text-gray-600 transition-colors hover:text-emerald-600"
+                  >
+                    fasfasrunning@gmail.com
+                  </a>
                 </div>
               </div>
 
@@ -99,7 +182,10 @@ function Contact() {
               We'd love to hear from you.
             </p>
 
-            <form className="mt-8 space-y-5">
+            <form
+              onSubmit={handleSubmit}
+              className="mt-8 space-y-5"
+            >
 
               {/* Name */}
               <div>
@@ -113,7 +199,10 @@ function Contact() {
                 <input
                   id="name"
                   type="text"
+                  value={form.name}
+                  onChange={handleChange}
                   placeholder="Your name"
+                  required
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                 />
               </div>
@@ -130,7 +219,10 @@ function Contact() {
                 <input
                   id="email"
                   type="email"
+                  value={form.email}
+                  onChange={handleChange}
                   placeholder="you@example.com"
+                  required
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                 />
               </div>
@@ -147,7 +239,10 @@ function Contact() {
                 <textarea
                   id="message"
                   rows="5"
+                  value={form.message}
+                  onChange={handleChange}
                   placeholder="Tell us what's on your mind..."
+                  required
                   className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
                 ></textarea>
               </div>
@@ -155,10 +250,24 @@ function Contact() {
               {/* Submit */}
               <button
                 type="submit"
-                className="w-full rounded-xl bg-emerald-600 px-6 py-3.5 font-semibold text-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:bg-emerald-700 hover:shadow-lg active:scale-[0.98]"
+                disabled={sending}
+                className="w-full rounded-xl bg-emerald-600 px-6 py-3.5 font-semibold text-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:bg-emerald-700 hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:scale-100"
               >
-                🌱 Send Message
+                {sending ? "Sending..." : "🌱 Send Message"}
               </button>
+
+              {/* Status */}
+              {success && (
+                <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                  {success}
+                </p>
+              )}
+
+              {error && (
+                <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+                  {error}
+                </p>
+              )}
 
             </form>
 
