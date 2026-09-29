@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import ConsistencyTree from "../components/ui/ConsistencyTree";
+import API_URL from "../config/api";
 
 function CommunityForest() {
   const [users, setUsers] = useState([]);
@@ -10,7 +11,7 @@ function CommunityForest() {
   useEffect(() => {
     const fetchCommunity = async () => {
       try {
-        const response = await fetch("/api/community");
+        const response = await fetch(`${API_URL}/api/community`);
         const data = await response.json();
 
         if (!response.ok || !data.success) {

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/logos/fasfas-logo.png";
+import API_URL from "../config/api";
 
 function Register() {
   const { login } = useAuth();
@@ -49,7 +50,7 @@ function Register() {
       setLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/users",
+        `${API_URL}/api/users`,
         {
           method: "POST",
           headers: {

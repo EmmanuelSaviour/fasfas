@@ -7,10 +7,9 @@ import {
 } from "react";
 
 import { useAuth } from "./AuthContext";
+import API_URL from "../config/api";
 
 const RunContext = createContext();
-
-const API_URL = "";
 
 /*
  * Convert a run timestamp into a local calendar-day key.

@@ -3,11 +3,10 @@ import {
   useContext,
   useState,
 } from "react";
+import API_URL from "../config/api";
 
 const AuthContext =
   createContext();
-
-const API_URL = "";
 
 /*
  * ================================

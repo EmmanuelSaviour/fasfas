@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
+import API_URL from "../config/api";
 
 function Contact() {
   const [form, setForm] = useState({
@@ -43,7 +44,7 @@ function Contact() {
     setSending(true);
 
     try {
-      const response = await fetch("/api/contact", {
+      const response = await fetch(`${API_URL}/api/contact`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
