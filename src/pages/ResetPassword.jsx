@@ -1,48 +1,86 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { Link, useSearchParams } from "react-router-dom";
 import logo from "../assets/logos/fasfas-logo.png";
+import API_URL from "../config/api";
 
-function Login() {
-  const { login } = useAuth();
-  const navigate = useNavigate();
+function ResetPassword() {
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
 
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
+    setMessage("");
     setError("");
 
-    if (!email.trim()) {
-      setError("Please enter your email.");
+    if (!token) {
+      setError(
+        "This password reset link is missing or invalid."
+      );
       return;
     }
 
     if (!password) {
-      setError("Please enter your password.");
+      setError("Please enter a new password.");
+      return;
+    }
+
+    if (password.length < 8) {
+      setError("Your new password must be at least 8 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Your passwords do not match.");
       return;
     }
 
     try {
       setLoading(true);
 
-      await login(
-        email.trim().toLowerCase(),
-        password
+      const response = await fetch(
+        `${API_URL}/api/auth/reset-password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            token,
+            password,
+          }),
+        }
       );
 
-      navigate("/dashboard");
-    } catch (loginError) {
-      console.error("Login error:", loginError);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Unable to reset your password."
+        );
+      }
+
+      setMessage(
+        data.message ||
+          "Your password has been reset successfully."
+      );
+
+      setPassword("");
+      setConfirmPassword("");
+    } catch (resetError) {
+      console.error("Reset password error:", resetError);
 
       setError(
-        loginError.message ||
-          "Unable to log in. Please check your email and password."
+        resetError.message ||
+          "Unable to reset your password. Please try again."
       );
     } finally {
       setLoading(false);
@@ -71,22 +109,29 @@ function Login() {
             </Link>
 
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900">
-              Welcome back
+              Create a new password
             </h1>
 
             <p className="mt-2 text-gray-600">
-              Keep moving. Keep growing.
+              Choose a secure password to continue your FasFas journey.
             </p>
 
           </div>
 
-          {/* Login Card */}
+          {/* Reset Password Card */}
           <div className="rounded-3xl border border-gray-100 bg-white p-8 shadow-xl md:p-10">
 
             <form
+              onSubmit={handleSubmit}
               className="space-y-5"
-              onSubmit={handleLogin}
             >
+
+              {/* Success */}
+              {message && (
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                  {message}
+                </div>
+              )}
 
               {/* Error */}
               {error && (
@@ -95,48 +140,14 @@ function Login() {
                 </div>
               )}
 
-              {/* Email */}
+              {/* New Password */}
               <div>
                 <label
-                  htmlFor="email"
+                  htmlFor="password"
                   className="mb-2 block text-sm font-semibold text-gray-700"
                 >
-                  Email
+                  New password
                 </label>
-
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(event) =>
-                    setEmail(event.target.value)
-                  }
-                  placeholder="you@example.com"
-                  disabled={loading}
-                  autoComplete="email"
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 disabled:bg-gray-50"
-                />
-              </div>
-
-              {/* Password */}
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-semibold text-gray-700"
-                  >
-                    Password
-                  </label>
-
-                  <Link
-                    to="/forgot-password"
-                    className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
-                  >
-                    Forgot password?
-                  </Link>
-
-                </div>
 
                 <input
                   id="password"
@@ -145,38 +156,57 @@ function Login() {
                   onChange={(event) =>
                     setPassword(event.target.value)
                   }
-                  placeholder="Enter your password"
+                  placeholder="Enter your new password"
                   disabled={loading}
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 disabled:bg-gray-50"
                 />
               </div>
 
-              {/* Login Button */}
+              {/* Confirm Password */}
+              <div>
+                <label
+                  htmlFor="confirmPassword"
+                  className="mb-2 block text-sm font-semibold text-gray-700"
+                >
+                  Confirm new password
+                </label>
+
+                <input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(event) =>
+                    setConfirmPassword(event.target.value)
+                  }
+                  placeholder="Confirm your new password"
+                  disabled={loading}
+                  autoComplete="new-password"
+                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 disabled:bg-gray-50"
+                />
+              </div>
+
+              {/* Reset Button */}
               <button
                 type="submit"
                 disabled={loading}
                 className="w-full rounded-xl bg-emerald-600 px-6 py-3.5 font-semibold text-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:bg-emerald-700 hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading
-                  ? "🌿 Checking your account..."
-                  : "🌿 Continue Growing"}
+                  ? "🌿 Resetting password..."
+                  : "Reset password"}
               </button>
 
             </form>
 
-            {/* Register */}
+            {/* Login */}
             <div className="mt-8 border-t border-gray-100 pt-6 text-center">
 
-              <p className="text-sm text-gray-600">
-                Don't have a FasFas account?
-              </p>
-
               <Link
-                to="/register"
-                className="mt-2 inline-block font-semibold text-emerald-600 transition hover:text-emerald-700"
+                to="/login"
+                className="font-semibold text-emerald-600 transition hover:text-emerald-700"
               >
-                Plant your tree →
+                ← Back to login
               </Link>
 
             </div>
@@ -203,4 +233,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default ResetPassword;

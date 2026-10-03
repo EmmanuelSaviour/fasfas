@@ -1,21 +1,18 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { Link } from "react-router-dom";
 import logo from "../assets/logos/fasfas-logo.png";
+import API_URL from "../config/api";
 
-function Login() {
-  const { login } = useAuth();
-  const navigate = useNavigate();
-
+function ForgotPassword() {
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-
+  const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
+    setMessage("");
     setError("");
 
     if (!email.trim()) {
@@ -23,26 +20,43 @@ function Login() {
       return;
     }
 
-    if (!password) {
-      setError("Please enter your password.");
-      return;
-    }
-
     try {
       setLoading(true);
 
-      await login(
-        email.trim().toLowerCase(),
-        password
+      const response = await fetch(
+        `${API_URL}/api/auth/forgot-password`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: email.trim().toLowerCase(),
+          }),
+        }
       );
 
-      navigate("/dashboard");
-    } catch (loginError) {
-      console.error("Login error:", loginError);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Unable to process your password reset request."
+        );
+      }
+
+      setMessage(
+        data.message ||
+          "If an account exists with that email, a password reset link has been sent."
+      );
+
+      setEmail("");
+    } catch (requestError) {
+      console.error("Forgot password error:", requestError);
 
       setError(
-        loginError.message ||
-          "Unable to log in. Please check your email and password."
+        requestError.message ||
+          "Unable to process your password reset request."
       );
     } finally {
       setLoading(false);
@@ -71,22 +85,30 @@ function Login() {
             </Link>
 
             <h1 className="mt-4 text-3xl font-bold tracking-tight text-gray-900">
-              Welcome back
+              Reset your password
             </h1>
 
             <p className="mt-2 text-gray-600">
-              Keep moving. Keep growing.
+              Enter your email and we'll send you a secure
+              password reset link.
             </p>
 
           </div>
 
-          {/* Login Card */}
+          {/* Card */}
           <div className="rounded-3xl border border-gray-100 bg-white p-8 shadow-xl md:p-10">
 
             <form
+              onSubmit={handleSubmit}
               className="space-y-5"
-              onSubmit={handleLogin}
             >
+
+              {/* Success */}
+              {message && (
+                <div className="rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+                  {message}
+                </div>
+              )}
 
               {/* Error */}
               {error && (
@@ -118,65 +140,27 @@ function Login() {
                 />
               </div>
 
-              {/* Password */}
-              <div>
-                <div className="mb-2 flex items-center justify-between">
-
-                  <label
-                    htmlFor="password"
-                    className="block text-sm font-semibold text-gray-700"
-                  >
-                    Password
-                  </label>
-
-                  <Link
-                    to="/forgot-password"
-                    className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
-                  >
-                    Forgot password?
-                  </Link>
-
-                </div>
-
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(event) =>
-                    setPassword(event.target.value)
-                  }
-                  placeholder="Enter your password"
-                  disabled={loading}
-                  autoComplete="current-password"
-                  className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100 disabled:bg-gray-50"
-                />
-              </div>
-
-              {/* Login Button */}
+              {/* Submit */}
               <button
                 type="submit"
                 disabled={loading}
                 className="w-full rounded-xl bg-emerald-600 px-6 py-3.5 font-semibold text-white shadow-md transition-all duration-300 hover:scale-[1.02] hover:bg-emerald-700 hover:shadow-lg active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading
-                  ? "🌿 Checking your account..."
-                  : "🌿 Continue Growing"}
+                  ? "🌿 Sending reset link..."
+                  : "Send reset link"}
               </button>
 
             </form>
 
-            {/* Register */}
+            {/* Back to Login */}
             <div className="mt-8 border-t border-gray-100 pt-6 text-center">
 
-              <p className="text-sm text-gray-600">
-                Don't have a FasFas account?
-              </p>
-
               <Link
-                to="/register"
-                className="mt-2 inline-block font-semibold text-emerald-600 transition hover:text-emerald-700"
+                to="/login"
+                className="font-semibold text-emerald-600 transition hover:text-emerald-700"
               >
-                Plant your tree →
+                ← Back to login
               </Link>
 
             </div>
@@ -203,4 +187,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default ForgotPassword;
