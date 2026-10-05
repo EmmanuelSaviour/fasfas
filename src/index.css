@@ -1,2 +1,21 @@
 @import "tailwindcss";
 
+@keyframes fasfasMove {
+  0% {
+    transform: translateX(0);
+  }
+
+  50% {
+    transform: translateX(8px);
+  }
+
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-\[fasfasMove_3s_ease-in-out_infinite\] {
+    animation: none;
+  }
+}

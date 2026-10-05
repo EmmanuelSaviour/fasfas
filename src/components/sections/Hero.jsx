@@ -11,9 +11,13 @@ function Hero() {
         <div className="min-w-0">
 
           <h1 className="text-4xl font-extrabold leading-tight sm:text-5xl md:text-6xl">
-            Keep Moving.
-            <br />
-            Keep Growing.
+            <span className="block animate-[fasfasMove_3s_ease-in-out_infinite]">
+              Keep Moving.
+            </span>
+
+            <span className="block animate-[fasfasMove_3s_ease-in-out_infinite] [animation-delay:0.4s]">
+              Keep Growing.
+            </span>
           </h1>
 
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-emerald-100 sm:text-lg md:text-xl">

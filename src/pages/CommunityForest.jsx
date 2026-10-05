@@ -7,6 +7,7 @@ function CommunityForest() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [selectedCard, setSelectedCard] = useState(null);
 
   useEffect(() => {
     const fetchCommunity = async () => {
@@ -111,53 +112,78 @@ function CommunityForest() {
 
         {!loading && !error && users.length > 0 && (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {users.map((user) => (
-              <div
-                key={user.id}
-                className="overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-100 transition duration-300 hover:-translate-y-1 hover:shadow-lg"
-              >
-                {/* Consistency Tree */}
-                <ConsistencyTree
-                  verifiedRuns={user.verifiedRuns}
-                  compact={true}
-                />
+            {users.map((user) => {
+              const isSelected = selectedCard === user.id;
 
-                {/* Runner Information */}
-                <div className="border-t border-gray-100 px-6 py-5">
-                  <div className="flex items-center justify-between gap-3">
-                    <h2 className="truncate text-lg font-bold text-gray-900">
-                      {user.name}
-                    </h2>
+              return (
+                <div
+                  key={user.id}
+                  onClick={() =>
+                    setSelectedCard((current) =>
+                      current === user.id ? null : user.id
+                    )
+                  }
+                  role="button"
+                  tabIndex={0}
+                  aria-pressed={isSelected}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
 
-                    <span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                      {user.rank}
-                    </span>
-                  </div>
+                      setSelectedCard((current) =>
+                        current === user.id ? null : user.id
+                      );
+                    }
+                  }}
+                  className={`cursor-pointer overflow-hidden rounded-3xl bg-white shadow-sm ring-1 ring-gray-100 transition duration-300 hover:-translate-y-1 hover:shadow-lg ${
+                    isSelected
+                      ? "-translate-y-1 shadow-xl ring-2 ring-emerald-500/40"
+                      : ""
+                  }`}
+                >
+                  {/* Consistency Tree */}
+                  <ConsistencyTree
+                    verifiedRuns={user.verifiedRuns}
+                    compact={true}
+                  />
 
-                  <div className="mt-4 grid grid-cols-2 gap-3">
-                    <div className="rounded-2xl bg-gray-50 p-3 text-center">
-                      <p className="text-lg font-bold text-gray-900">
-                        {user.verifiedRuns}
-                      </p>
+                  {/* Runner Information */}
+                  <div className="border-t border-gray-100 px-6 py-5">
+                    <div className="flex items-center justify-between gap-3">
+                      <h2 className="truncate text-lg font-bold text-gray-900">
+                        {user.name}
+                      </h2>
 
-                      <p className="text-xs text-gray-500">
-                        Verified Runs
-                      </p>
+                      <span className="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                        {user.rank}
+                      </span>
                     </div>
 
-                    <div className="rounded-2xl bg-gray-50 p-3 text-center">
-                      <p className="text-lg font-bold text-gray-900">
-                        {user.totalDistance}
-                      </p>
+                    <div className="mt-4 grid grid-cols-2 gap-3">
+                      <div className="rounded-2xl bg-gray-50 p-3 text-center">
+                        <p className="text-lg font-bold text-gray-900">
+                          {user.verifiedRuns}
+                        </p>
 
-                      <p className="text-xs text-gray-500">
-                        Kilometers
-                      </p>
+                        <p className="text-xs text-gray-500">
+                          Verified Runs
+                        </p>
+                      </div>
+
+                      <div className="rounded-2xl bg-gray-50 p-3 text-center">
+                        <p className="text-lg font-bold text-gray-900">
+                          {user.totalDistance}
+                        </p>
+
+                        <p className="text-xs text-gray-500">
+                          Kilometers
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </section>
