@@ -1,6 +1,9 @@
 import { useNavigate } from "react-router-dom";
+
 import DashboardNavbar from "../components/layout/DashboardNavbar";
+
 import ConsistencyTree from "../components/ui/ConsistencyTree";
+
 import { useRun } from "../context/RunContext";
 
 import {
@@ -118,7 +121,9 @@ function Dashboard() {
             </p>
 
             <h1 className="mt-3 text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
-              Welcome back, Runner. 🌱
+              <span className="block animate-[fasfasMove_3s_ease-in-out_infinite]">
+                Welcome back, Runner. 🌱
+              </span>
             </h1>
 
             <p className="mt-4 max-w-2xl text-base leading-relaxed text-emerald-100 sm:text-lg">

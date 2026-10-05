@@ -1,19 +1,41 @@
 import { useEffect, useState } from "react";
+
 import { useNavigate } from "react-router-dom";
+
 import DashboardNavbar from "../components/layout/DashboardNavbar";
+
 import { useAuth } from "../context/AuthContext";
+
 import { useRun } from "../context/RunContext";
+
 import { getRank } from "../utils/rankUtils";
+import maleBlackGreen from "../assets/avatars/male-black-green.png";
+import maleWhiteBlue from "../assets/avatars/male-white-blue.png";
+import femaleBlackBlue from "../assets/avatars/female-black-blue.png";
+import femaleWhiteGreen from "../assets/avatars/female-white-green.png";
+
 
 const AVATAR_OPTIONS = [
-  { id: "runner", emoji: "🏃", label: "Runner" },
-  { id: "runner-light", emoji: "🏃‍♀️", label: "Runner" },
-  { id: "runner-dark", emoji: "🏃‍♂️", label: "Runner" },
-  { id: "person", emoji: "🧑", label: "Classic" },
-  { id: "person-beard", emoji: "🧔", label: "Classic" },
-  { id: "fire", emoji: "🔥", label: "Fire" },
-  { id: "lightning", emoji: "⚡", label: "Energy" },
-  { id: "tree", emoji: "🌳", label: "Tree" },
+  {
+    id: "male-black-green",
+    image: maleBlackGreen,
+    label: "Black Male Runner",
+  },
+  {
+    id: "male-white-blue",
+    image: maleWhiteBlue,
+    label: "White Male Runner",
+  },
+  {
+    id: "female-black-blue",
+    image: femaleBlackBlue,
+    label: "Black Female Runner",
+  },
+  {
+    id: "female-white-green",
+    image: femaleWhiteGreen,
+    label: "White Female Runner",
+  },
 ];
 
 function Profile() {
@@ -32,7 +54,7 @@ function Profile() {
   // ================= Customization State =================
 
   const [name, setName] = useState("");
-  const [avatar, setAvatar] = useState("runner");
+  const [avatar, setAvatar] = useState("male-black-green");
   const [communityVisible, setCommunityVisible] = useState(true);
 
   const [saving, setSaving] = useState(false);
@@ -40,16 +62,22 @@ function Profile() {
   const [error, setError] = useState("");
 
   // Load current profile information
+
   useEffect(() => {
     if (!user) return;
 
     setName(user.name || "");
-    setAvatar(user.avatar || "runner");
+    setAvatar(
+      AVATAR_OPTIONS.some((option) => option.id === user.avatar)
+        ? user.avatar
+        : "male-black-green"
+    );
     setCommunityVisible(user.communityVisible ?? true);
   }, [user]);
 
   const selectedAvatar =
-    AVATAR_OPTIONS.find((option) => option.id === avatar)?.emoji || "🏃";
+    AVATAR_OPTIONS.find((option) => option.id === avatar) ||
+    AVATAR_OPTIONS[0];
 
   // ================= Save Profile =================
 
@@ -103,8 +131,12 @@ function Profile() {
 
               {/* Avatar */}
 
-              <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-full bg-white/20 text-5xl shadow-inner backdrop-blur-sm sm:h-28 sm:w-28 sm:text-6xl">
-                {selectedAvatar}
+              <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/20 shadow-inner backdrop-blur-sm sm:h-28 sm:w-28">
+                <img
+                  src={selectedAvatar.image}
+                  alt={selectedAvatar.label}
+                  className="h-full w-full object-contain"
+                />
               </div>
 
               {/* User Information */}
@@ -116,7 +148,9 @@ function Profile() {
                 </p>
 
                 <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">
-                  {user?.name || "Runner"}
+                  <span className="block animate-[fasfasMove_3s_ease-in-out_infinite]">
+                    {user?.name || "Runner"}
+                  </span>
                 </h1>
 
                 <p className="mt-2 text-emerald-100">
@@ -242,6 +276,7 @@ function Profile() {
               <div className="mt-7">
 
                 <div>
+
                   <p className="text-sm font-semibold text-gray-800">
                     Choose Your Avatar
                   </p>
@@ -249,11 +284,13 @@ function Profile() {
                   <p className="mt-1 text-sm text-gray-500">
                     Pick an avatar that represents you.
                   </p>
+
                 </div>
 
-                <div className="mt-4 grid grid-cols-4 gap-3 sm:grid-cols-8">
+                <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
 
                   {AVATAR_OPTIONS.map((option) => {
+
                     const isSelected = avatar === option.id;
 
                     return (
@@ -262,13 +299,17 @@ function Profile() {
                         type="button"
                         onClick={() => setAvatar(option.id)}
                         aria-label={`Select ${option.label} avatar`}
-                        className={`flex aspect-square items-center justify-center rounded-2xl border-2 text-3xl transition-all duration-200 sm:text-4xl ${
+                        className={`relative flex aspect-square items-center justify-center overflow-hidden rounded-2xl border-2 bg-gray-50 transition-all duration-300 ${
                           isSelected
-                            ? "scale-[1.03] border-emerald-500 bg-emerald-50 shadow-sm"
-                            : "border-gray-100 bg-gray-50 hover:border-emerald-200 hover:bg-emerald-50/50"
+                            ? "scale-[1.03] border-emerald-500 bg-emerald-50 shadow-lg ring-2 ring-emerald-500/20"
+                            : "border-gray-100 hover:-translate-y-1 hover:border-emerald-200 hover:bg-emerald-50/50 hover:shadow-md"
                         }`}
                       >
-                        {option.emoji}
+                        <img
+                          src={option.image}
+                          alt={option.label}
+                          className="h-full w-full object-contain p-2"
+                        />
                       </button>
                     );
                   })}
@@ -315,6 +356,7 @@ function Profile() {
                         : "bg-gray-300"
                     }`}
                   >
+
                     <span
                       className={`absolute left-1 top-1 h-5 w-5 rounded-full bg-white shadow-sm transition-transform duration-200 ${
                         communityVisible
@@ -322,6 +364,7 @@ function Profile() {
                           : "translate-x-0"
                       }`}
                     />
+
                   </button>
 
                 </div>
@@ -331,15 +374,19 @@ function Profile() {
               {/* Save Feedback */}
 
               {message && (
+
                 <div className="mt-5 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
                   ✓ {message}
                 </div>
+
               )}
 
               {error && (
+
                 <div className="mt-5 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
                   {error}
                 </div>
+
               )}
 
               {/* Save Button */}
@@ -382,6 +429,7 @@ function Profile() {
                 <div className="flex flex-col gap-1 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
 
                   <div>
+
                     <p className="text-sm font-medium text-gray-500">
                       Full Name
                     </p>
@@ -389,6 +437,7 @@ function Profile() {
                     <p className="mt-1 font-semibold text-gray-900">
                       {user?.name || "Not available"}
                     </p>
+
                   </div>
 
                   <span className="text-xl">
