@@ -1,4 +1,5 @@
 import {
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -96,6 +97,17 @@ function Run() {
   const [distance, setDistance] =
     useState(0);
 
+  const [cadence, setCadence] = useState(0);
+  const [motionStatus, setMotionStatus] = useState("idle");
+
+  const stepCountRef = useRef(0);
+  const lastStepTimeRef = useRef(0);
+  const motionValuesRef = useRef([]);
+  const previousVariationRef = useRef(0);
+  const lastPeakRef = useRef(false);
+  const cadenceStartTimeRef = useRef(0);
+  const stepTimesRef = useRef([]);
+
   /*
    * 2 km move-goal notification.
    * This is separate from the distance
@@ -163,6 +175,8 @@ function Run() {
   const runStartTimeRef =
     useRef(null);
 
+  const activeRunRef = useRef(false);
+
   const validGpsPointsRef =
     useRef(0);
 
@@ -192,6 +206,149 @@ function Run() {
    * Haversine Distance
    * ==========================================
    */
+
+  /*
+   * STRICTER CADENCE DETECTOR
+   *
+   * Requires valid acceleration data, clear peaks,
+   * enough detected steps, and consistent timing.
+   */
+  const handleMotion = useCallback((event) => {
+    const acceleration = event.acceleration;
+
+    // Require usable acceleration data.
+    if (
+      !acceleration ||
+      acceleration.x == null ||
+      acceleration.y == null ||
+      acceleration.z == null ||
+      !Number.isFinite(acceleration.x) ||
+      !Number.isFinite(acceleration.y) ||
+      !Number.isFinite(acceleration.z)
+    ) {
+      return;
+    }
+
+    const magnitude = Math.sqrt(
+      acceleration.x ** 2 +
+      acceleration.y ** 2 +
+      acceleration.z ** 2
+    );
+
+    const now = Date.now();
+    const values = motionValuesRef.current;
+
+    // Estimate the recent acceleration baseline.
+    const average =
+      values.length > 0
+        ? values.reduce((sum, value) => sum + value, 0) /
+          values.length
+        : magnitude;
+
+    const variation = magnitude - average;
+
+    values.push(magnitude);
+
+    if (values.length > 20) {
+      values.shift();
+    }
+
+    const previousVariation = previousVariationRef.current;
+    previousVariationRef.current = variation;
+
+    // Require a clear acceleration peak.
+    if (variation >= 2.2) {
+      lastPeakRef.current = true;
+    }
+
+    const isFallingPeak =
+      lastPeakRef.current &&
+      variation < previousVariation &&
+      previousVariation >= 2.2;
+
+    if (!isFallingPeak) {
+      if (variation < 0.4) {
+        lastPeakRef.current = false;
+      }
+      return;
+    }
+
+    lastPeakRef.current = false;
+
+    // Reject peaks that occur too close together.
+    const previousStepTime = lastStepTimeRef.current;
+
+    if (
+      previousStepTime !== 0 &&
+      now - previousStepTime < 400
+    ) {
+      return;
+    }
+
+    lastStepTimeRef.current = now;
+
+    const stepTimes = stepTimesRef.current;
+    stepTimes.push(now);
+
+    // Keep only recent peak timestamps.
+    while (
+      stepTimes.length > 0 &&
+      now - stepTimes[0] > 8000
+    ) {
+      stepTimes.shift();
+    }
+
+    // Require at least 8 peaks before estimating cadence.
+    if (stepTimes.length < 8) {
+      return;
+    }
+
+    const recentTimes = stepTimes.slice(-8);
+    const intervals = [];
+
+    for (let i = 1; i < recentTimes.length; i += 1) {
+      intervals.push(recentTimes[i] - recentTimes[i - 1]);
+    }
+
+    if (intervals.length < 7) {
+      return;
+    }
+
+    // Calculate the median interval.
+    const sortedIntervals = [...intervals].sort((a, b) => a - b);
+    const middle = Math.floor(sortedIntervals.length / 2);
+
+    const medianInterval =
+      sortedIntervals.length % 2 === 0
+        ? (sortedIntervals[middle - 1] + sortedIntervals[middle]) / 2
+        : sortedIntervals[middle];
+
+    // Reject implausibly fast or slow step rhythms.
+    if (medianInterval < 300 || medianInterval > 1500) {
+      return;
+    }
+
+    // Require a consistent rhythm across recent peaks.
+    const consistentIntervals = intervals.filter(
+      (interval) =>
+        Math.abs(interval - medianInterval) <=
+        Math.max(80, medianInterval * 0.12)
+    );
+
+    if (consistentIntervals.length < 6) {
+      return;
+    }
+
+    const stepsPerMinute = 60000 / medianInterval;
+
+    if (
+      Number.isFinite(stepsPerMinute) &&
+      stepsPerMinute >= 40 &&
+      stepsPerMinute <= 200
+    ) {
+      setCadence(Math.round(stepsPerMinute));
+    }
+  }, []);
 
   const calculateDistance = (
     latitude1,
@@ -362,9 +519,7 @@ function Run() {
   const saveActiveRun = (
     overrides = {}
   ) => {
-    if (
-      !runStartTimeRef.current
-    ) {
+    if (!runStartTimeRef.current || !activeRunRef.current) {
       return;
     }
 
@@ -442,15 +597,14 @@ function Run() {
    */
 
   const clearActiveRun = () => {
+    activeRunRef.current = false;
+
     localStorage.removeItem(
       ACTIVE_RUN_KEY
     );
 
-    runStartTimeRef.current =
-      null;
-
-    totalDistanceRef.current =
-      0;
+    runStartTimeRef.current = null;
+    totalDistanceRef.current = 0;
   };
 
   /*
@@ -484,6 +638,56 @@ function Run() {
    * GPS Tracking
    * ==========================================
    */
+
+  const startMotionTracking = async () => {
+    if (!("DeviceMotionEvent" in window)) {
+      setMotionStatus("unavailable");
+      return;
+    }
+
+    try {
+      if (
+        typeof DeviceMotionEvent.requestPermission ===
+        "function"
+      ) {
+        const permission =
+          await DeviceMotionEvent.requestPermission();
+
+        if (permission !== "granted") {
+          setMotionStatus("denied");
+          return;
+        }
+      }
+
+      window.removeEventListener(
+        "devicemotion",
+        handleMotion
+      );
+
+      window.addEventListener(
+        "devicemotion",
+        handleMotion
+      );
+
+      setMotionStatus("listening");
+    } catch (error) {
+      console.warn(
+        "Motion sensor unavailable:",
+        error
+      );
+
+      setMotionStatus("unavailable");
+    }
+  };
+
+  const stopMotionTracking = () => {
+    window.removeEventListener(
+      "devicemotion",
+      handleMotion
+    );
+
+    setMotionStatus("idle");
+  };
 
   const startLocationTracking =
     () => {
@@ -546,6 +750,10 @@ function Run() {
                 ? accuracy
                 : null;
 
+            if (currentAccuracy === null || currentAccuracy > 20) {
+              return;
+            }
+
             setGpsAccuracy(
               currentAccuracy
             );
@@ -560,6 +768,8 @@ function Run() {
                 currentLatitude,
               longitude:
                 currentLongitude,
+              accuracy:
+                currentAccuracy,
             };
 
             const currentTimestamp =
@@ -637,6 +847,23 @@ function Run() {
                 )
               );
 
+            /*
+             * Require movement to exceed the combined
+             * GPS uncertainty of the current and previous
+             * positions. This helps prevent stationary
+             * GPS drift from being counted as distance.
+             */
+            const previousAccuracy =
+              Number.isFinite(previousPosition.accuracy)
+                ? previousPosition.accuracy
+                : currentAccuracy;
+
+            const minimumMeaningfulMovement =
+              Math.max(
+                MIN_MOVEMENT,
+                ((currentAccuracy + previousAccuracy) * 1.5) / 1000
+              );
+
             setLastMovement(
               movement
             );
@@ -674,20 +901,16 @@ function Run() {
              * Tiny Movement
              * ==================================
              *
-             * Tiny GPS noise is ignored.
-             * The baseline still moves forward.
+             * GPS movement within the estimated
+             * noise range is ignored. The baseline
+             * stays in place so genuine movement can
+             * accumulate until it is measurable.
              */
 
             if (
               movementDistance <
-              MIN_MOVEMENT
+              minimumMeaningfulMovement
             ) {
-              previousPositionRef.current =
-                currentPosition;
-
-              previousTimestampRef.current =
-                currentTimestamp;
-
               setLocationStatus(
                 "tracking"
               );
@@ -714,18 +937,7 @@ function Run() {
              * GPS FILTER
              * ==================================
              *
-             * IMPORTANT:
-             *
-             * We no longer reject movement
-             * simply because GPS accuracy is
-             * poor.
-             *
-             * Phone GPS accuracy can temporarily
-             * become poor while the runner is
-             * moving, especially around buildings
-             * or indoors.
-             *
-             * We reject only obvious jumps.
+             * Reject only obvious GPS jumps.
              */
 
             const isHugeJump =
@@ -937,6 +1149,17 @@ function Run() {
 
   const resetRunState = () => {
     stopLocationTracking();
+    stopMotionTracking();
+
+    stepCountRef.current = 0;
+    lastStepTimeRef.current = 0;
+    motionValuesRef.current = [];
+    stepTimesRef.current = [];
+    previousVariationRef.current = 0;
+    cadenceStartTimeRef.current = 0;
+    lastPeakRef.current = false;
+
+    setCadence(0);
 
     clearActiveRun();
 
@@ -1106,6 +1329,7 @@ function Run() {
           )
         );
 
+      activeRunRef.current = true;
       runStartTimeRef.current =
         activeRun.startTime;
 
@@ -1302,6 +1526,11 @@ function Run() {
   useEffect(() => {
     return () => {
       stopLocationTracking();
+
+      window.removeEventListener(
+        "devicemotion",
+        handleMotion
+      );
     };
   }, []);
 
@@ -1311,8 +1540,19 @@ function Run() {
    * ==========================================
    */
 
-  const handleStart = () => {
+  const handleStart = async () => {
+    startMotionTracking();
     stopLocationTracking();
+
+    stepCountRef.current = 0;
+    lastStepTimeRef.current = 0;
+    motionValuesRef.current = [];
+    stepTimesRef.current = [];
+    previousVariationRef.current = 0;
+    cadenceStartTimeRef.current = 0;
+    lastPeakRef.current = false;
+
+    setCadence(0);
 
     localStorage.removeItem(
       ACTIVE_RUN_KEY
@@ -1336,6 +1576,8 @@ function Run() {
     setGoalAccomplished(false);
 
     setShowGoalAlert(false);
+
+    activeRunRef.current = true;
 
     const newStartTime =
       Date.now();
@@ -1414,6 +1656,7 @@ function Run() {
     setIsFinished(true);
 
     stopLocationTracking();
+    stopMotionTracking();
 
     setLocationStatus(
       "stopped"
@@ -1480,17 +1723,14 @@ function Run() {
       async () => {
         try {
           await addVerifiedRun({
-            duration:
-              seconds,
-
-            distance:
-              finalDistance,
-
-            gpsPoints:
-              gpsUpdates,
-
+            duration: seconds,
+            distance: finalDistance,
+            gpsPoints: gpsUpdates,
             maxSpeed: 0,
-
+            cadence:
+              Number.isFinite(Number(cadence)) && cadence > 0
+                ? Math.round(cadence)
+                : null,
             route: [],
           });
 
@@ -1727,7 +1967,7 @@ function Run() {
 
           {/* Stats */}
 
-          <div className="mt-10 grid gap-6 sm:grid-cols-2">
+          <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
 
             {/* Duration */}
 
@@ -1767,6 +2007,25 @@ function Run() {
                 )} km
               </p>
 
+            </div>
+
+            {/* Cadence */}
+
+            <div className="rounded-2xl bg-gray-50 p-8 text-center">
+
+              <div className="text-4xl">👟</div>
+
+              <p className="mt-4 text-sm font-medium text-gray-500">
+                Cadence
+              </p>
+
+              <p className="mt-2 text-4xl font-bold text-gray-900">
+                {cadence}
+              </p>
+
+              <p className="mt-1 text-sm text-gray-400">
+                steps/min
+              </p>
             </div>
 
           </div>

@@ -1,9 +1,7 @@
+
 import { useNavigate } from "react-router-dom";
-
 import DashboardNavbar from "../components/layout/DashboardNavbar";
-
 import ConsistencyTree from "../components/ui/ConsistencyTree";
-
 import { useRun } from "../context/RunContext";
 
 import {
@@ -17,11 +15,7 @@ function formatDuration(seconds) {
   const totalSeconds = Number(seconds) || 0;
 
   const hours = Math.floor(totalSeconds / 3600);
-
-  const minutes = Math.floor(
-    (totalSeconds % 3600) / 60
-  );
-
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
   const secs = totalSeconds % 60;
 
   if (hours > 0) {
@@ -63,41 +57,21 @@ function Dashboard() {
     currentStreak,
   } = useRun();
 
-  /*
-   * ================================
-   * FasFas Rank
-   * ================================
-   */
-
+  // FasFas Rank
   const currentRank = getRank(verifiedRuns);
-
   const nextRank = getNextRank(verifiedRuns);
-
-  const runsUntilNextRank =
-    getRunsUntilNextRank(verifiedRuns);
-
-  const journeyProgress =
-    getRankProgress(verifiedRuns);
-
+  const runsUntilNextRank = getRunsUntilNextRank(verifiedRuns);
+  const journeyProgress = getRankProgress(verifiedRuns);
   const isPermanent = verifiedRuns >= 30;
 
-  /*
-   * ================================
-   * Recent Runs
-   * ================================
-   */
-
+  // Recent Runs
   const recentRuns = [...(runs || [])]
     .sort((a, b) => {
       const dateA =
-        new Date(
-          a.createdAt || a.date
-        ).getTime() || 0;
+        new Date(a.createdAt || a.date).getTime() || 0;
 
       const dateB =
-        new Date(
-          b.createdAt || b.date
-        ).getTime() || 0;
+        new Date(b.createdAt || b.date).getTime() || 0;
 
       return dateB - dateA;
     })
@@ -105,17 +79,13 @@ function Dashboard() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-
       <DashboardNavbar />
 
       <div className="px-4 py-6 sm:px-6 sm:py-8 lg:py-10">
-
         <div className="mx-auto max-w-7xl">
 
-          {/* ================= Welcome ================= */}
-
+          {/* Welcome */}
           <section className="rounded-3xl bg-gradient-to-br from-emerald-600 via-emerald-500 to-blue-600 p-6 text-white shadow-lg sm:p-8 md:p-10">
-
             <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-100 sm:text-sm">
               FasFas Dashboard
             </p>
@@ -130,20 +100,14 @@ function Dashboard() {
               Keep moving, keep growing, and build your
               consistency one verified run at a time.
             </p>
-
           </section>
 
-          {/* ================= Stats ================= */}
-
+          {/* Stats */}
           <section className="mt-6 grid gap-4 sm:mt-8 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
 
             {/* Verified Runs */}
-
             <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-
-              <div className="text-3xl">
-                🏃
-              </div>
+              <div className="text-3xl">🏃</div>
 
               <p className="mt-3 text-sm font-medium text-gray-500 sm:mt-4">
                 Verified Runs
@@ -152,16 +116,11 @@ function Dashboard() {
               <p className="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl">
                 {verifiedRuns}
               </p>
-
             </div>
 
             {/* Total Distance */}
-
             <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-
-              <div className="text-3xl">
-                📍
-              </div>
+              <div className="text-3xl">📍</div>
 
               <p className="mt-3 text-sm font-medium text-gray-500 sm:mt-4">
                 Total Distance
@@ -170,16 +129,11 @@ function Dashboard() {
               <p className="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl">
                 {Number(totalDistance || 0).toFixed(2)} km
               </p>
-
             </div>
 
             {/* Current Streak */}
-
             <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-
-              <div className="text-3xl">
-                🔥
-              </div>
+              <div className="text-3xl">🔥</div>
 
               <p className="mt-3 text-sm font-medium text-gray-500 sm:mt-4">
                 Current Streak
@@ -187,20 +141,13 @@ function Dashboard() {
 
               <p className="mt-1 text-2xl font-bold text-gray-900 sm:text-3xl">
                 {currentStreak}{" "}
-                {currentStreak === 1
-                  ? "day"
-                  : "days"}
+                {currentStreak === 1 ? "day" : "days"}
               </p>
-
             </div>
 
             {/* Current Rank */}
-
             <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-
-              <div className="text-3xl">
-                🏅
-              </div>
+              <div className="text-3xl">🏅</div>
 
               <p className="mt-3 text-sm font-medium text-gray-500 sm:mt-4">
                 Current Rank
@@ -209,23 +156,16 @@ function Dashboard() {
               <p className="mt-1 text-2xl font-bold text-emerald-600 sm:text-3xl">
                 {currentRank}
               </p>
-
             </div>
-
           </section>
 
-          {/* ================= Main Dashboard ================= */}
-
+          {/* Main Dashboard */}
           <section className="mt-6 grid gap-6 sm:mt-8 lg:grid-cols-3 lg:gap-8">
 
-            {/* ================= Consistency Tree ================= */}
-
+            {/* Consistency Tree */}
             <div className="rounded-3xl bg-white p-6 shadow-sm sm:p-8 lg:col-span-2">
-
               <div className="flex items-start justify-between gap-4">
-
                 <div className="min-w-0">
-
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 sm:text-sm">
                     Your Progress
                   </p>
@@ -233,13 +173,11 @@ function Dashboard() {
                   <h2 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
                     Consistency Tree
                   </h2>
-
                 </div>
 
                 <div className="shrink-0 text-4xl sm:text-5xl">
                   🌱
                 </div>
-
               </div>
 
               <p className="mt-4 max-w-xl text-sm leading-relaxed text-gray-600 sm:mt-5 sm:text-base">
@@ -249,21 +187,14 @@ function Dashboard() {
               </p>
 
               <div className="mt-6 sm:mt-8">
-                <ConsistencyTree
-                  verifiedRuns={verifiedRuns}
-                />
+                <ConsistencyTree verifiedRuns={verifiedRuns} />
               </div>
-
             </div>
 
-            {/* ================= Next Rank ================= */}
-
+            {/* Next Rank */}
             <div className="rounded-3xl bg-emerald-50 p-6 sm:p-8">
-
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 sm:text-sm">
-                {isPermanent
-                  ? "FasFas Milestone"
-                  : "Next Milestone"}
+                {isPermanent ? "FasFas Milestone" : "Next Milestone"}
               </p>
 
               <h2 className="mt-3 text-xl font-bold text-gray-900 sm:text-2xl">
@@ -273,25 +204,19 @@ function Dashboard() {
               </h2>
 
               <div className="mt-5 text-5xl sm:mt-6 sm:text-6xl">
-                {isPermanent
-                  ? "🌳"
-                  : "🏃"}
+                {isPermanent ? "🌳" : "🏃"}
               </div>
 
               <p className="mt-5 text-sm leading-relaxed text-gray-600 sm:mt-6 sm:text-base">
                 {isPermanent
                   ? "You've reached Stubborn, the final FasFas rank. Your Consistency Tree is now permanently flourished and you're part of the FasFas forest."
                   : `Complete your next ${runsUntilNextRank} verified ${
-                      runsUntilNextRank === 1
-                        ? "run"
-                        : "runs"
+                      runsUntilNextRank === 1 ? "run" : "runs"
                     } to progress from ${currentRank} to ${nextRank}.`}
               </p>
 
               <div className="mt-6">
-
                 <div className="flex justify-between gap-4 text-xs font-medium text-gray-600 sm:text-sm">
-
                   <span>
                     {isPermanent
                       ? "30+ runs"
@@ -304,35 +229,24 @@ function Dashboard() {
                         } runs`}
                   </span>
 
-                  <span>
-                    {Math.round(journeyProgress)}%
-                  </span>
-
+                  <span>{Math.round(journeyProgress)}%</span>
                 </div>
 
                 <div className="mt-2 h-2 overflow-hidden rounded-full bg-emerald-200">
-
                   <div
                     className="h-full rounded-full bg-emerald-600 transition-all duration-500"
                     style={{
                       width: `${journeyProgress}%`,
                     }}
                   />
-
                 </div>
-
               </div>
-
             </div>
-
           </section>
 
-          {/* ================= Recent Runs ================= */}
-
+          {/* Recent Runs */}
           <section className="mt-6 rounded-3xl bg-white p-6 shadow-sm sm:mt-8 sm:p-8">
-
             <div>
-
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-600 sm:text-sm">
                 Your Activity
               </p>
@@ -340,13 +254,10 @@ function Dashboard() {
               <h2 className="mt-2 text-2xl font-bold text-gray-900 sm:text-3xl">
                 Recent Runs
               </h2>
-
             </div>
 
             {recentRuns.length === 0 ? (
-
               <div className="mt-5 rounded-2xl bg-gray-50 p-6 text-center sm:mt-6 sm:p-8">
-
                 <div className="text-4xl sm:text-5xl">
                   🏃‍♂️
                 </div>
@@ -359,30 +270,21 @@ function Dashboard() {
                   Complete your first verified run and
                   it will appear here.
                 </p>
-
               </div>
-
             ) : (
-
               <div className="mt-5 space-y-3 sm:mt-6 sm:space-y-4">
-
                 {recentRuns.map((run) => (
-
                   <div
                     key={run.id}
                     className="flex flex-col gap-4 rounded-2xl border border-gray-100 p-4 transition-shadow hover:shadow-sm sm:flex-row sm:items-center sm:justify-between sm:p-5"
                   >
-
                     <div className="flex items-center gap-3 sm:gap-4">
-
                       <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-emerald-100 text-xl sm:h-12 sm:w-12 sm:text-2xl">
                         🏃
                       </div>
 
                       <div className="min-w-0">
-
                         <div className="flex flex-wrap items-center gap-2">
-
                           <h3 className="font-bold text-gray-900">
                             Run #{run.runNumber}
                           </h3>
@@ -390,71 +292,99 @@ function Dashboard() {
                           <span className="rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
                             ✓ Verified
                           </span>
-
                         </div>
 
                         <p className="mt-1 text-xs text-gray-500 sm:text-sm">
-                          {formatRunDate(
-                            run.createdAt || run.date
-                          )}
+                          {formatRunDate(run.createdAt || run.date)}
                         </p>
-
                       </div>
-
                     </div>
 
-                    <div className="flex items-center gap-8 pl-14 text-sm sm:gap-6 sm:pl-0">
+                    <div className="grid min-w-0 grid-cols-2 gap-4 pl-14 text-sm sm:flex sm:flex-wrap sm:items-center sm:gap-6 sm:pl-0">
 
                       {/* Distance */}
-
-                      <div>
-
+                      <div className="min-w-0">
                         <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
                           Distance
                         </p>
 
-                        <p className="mt-1 font-bold text-gray-900">
-                          {Number(
-                            run.distance || 0
-                          ).toFixed(2)} km
+                        <p className="mt-1 break-words font-bold text-gray-900">
+                          {Number(run.distance || 0).toFixed(2)} km
                         </p>
-
                       </div>
 
                       {/* Duration */}
-
-                      <div>
-
+                      <div className="min-w-0">
                         <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
                           Duration
                         </p>
 
-                        <p className="mt-1 font-bold text-gray-900">
-                          {formatDuration(
-                            run.duration
-                          )}
+                        <p className="mt-1 break-words font-bold text-gray-900">
+                          {formatDuration(run.duration)}
                         </p>
-
                       </div>
 
+                      {/* Estimated Calories */}
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                          Estimated Calories
+                        </p>
+
+                        <p className="mt-1 break-words font-bold text-gray-900">
+                          {Number(run.estimatedCalories) > 0
+                            ? `${Math.round(Number(run.estimatedCalories))} kcal`
+                            : "—"}
+                        </p>
+                      </div>
+
+                      {/* Cadence */}
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                          Cadence
+                        </p>
+
+                        <p className="mt-1 break-words font-bold text-gray-900">
+                          {Number(run.cadence) > 0
+                            ? `${Math.round(Number(run.cadence))} steps/min`
+                            : "—"}
+                        </p>
+                      </div>
+
+                      {/* GPS Points */}
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                          GPS Points
+                        </p>
+
+                        <p className="mt-1 break-words font-bold text-gray-900">
+                          {Number(run.gpsPoints) > 0
+                            ? Math.round(Number(run.gpsPoints))
+                            : "—"}
+                        </p>
+                      </div>
+
+                      {/* Max Speed */}
+                      <div className="min-w-0">
+                        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                          Max Speed
+                        </p>
+
+                        <p className="mt-1 break-words font-bold text-gray-900">
+                          {Number(run.maxSpeed) > 0
+                            ? `${Number(run.maxSpeed).toFixed(1)} km/h`
+                            : "—"}
+                        </p>
+                      </div>
                     </div>
-
                   </div>
-
                 ))}
-
               </div>
-
             )}
-
           </section>
 
-          {/* ================= Start Run ================= */}
-
+          {/* Start Run */}
           <section className="mt-6 rounded-3xl bg-white p-6 text-center shadow-sm sm:mt-8 sm:p-8">
-
             <div className="mx-auto max-w-2xl">
-
               <div className="text-4xl sm:text-5xl">
                 🏃‍♂️
               </div>
@@ -475,15 +405,11 @@ function Dashboard() {
               >
                 🏃 Start a Run
               </button>
-
             </div>
-
           </section>
 
         </div>
-
       </div>
-
     </main>
   );
 }

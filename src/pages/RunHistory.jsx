@@ -1,3 +1,4 @@
+
 import { useNavigate } from "react-router-dom";
 import DashboardNavbar from "../components/layout/DashboardNavbar";
 import { useRun } from "../context/RunContext";
@@ -18,7 +19,8 @@ function formatDuration(seconds) {
 
   return `${String(minutes).padStart(2, "0")}:${String(secs).padStart(
     2,
-    "0")}`;
+    "0"
+  )}`;
 }
 
 function formatRunDate(date) {
@@ -53,6 +55,21 @@ function formatRunTime(date) {
   });
 }
 
+function formatEstimatedCalories(run) {
+  const calories = Number(run.estimatedCalories);
+
+  if (
+    run.estimatedCalories === null ||
+    run.estimatedCalories === undefined ||
+    !Number.isFinite(calories) ||
+    calories <= 0
+  ) {
+    return "—";
+  }
+
+  return `${Math.round(calories)} kcal`;
+}
+
 function RunHistory() {
   const navigate = useNavigate();
 
@@ -66,8 +83,13 @@ function RunHistory() {
   const verifiedRunsList = [...(runs || [])]
     .filter((run) => run.status === "verified")
     .sort((a, b) => {
-      const dateA = new Date(a.date).getTime() || 0;
-      const dateB = new Date(b.date).getTime() || 0;
+      const dateA = new Date(
+        a.date || a.createdAt
+      ).getTime() || 0;
+
+      const dateB = new Date(
+        b.date || b.createdAt
+      ).getTime() || 0;
 
       return dateB - dateA;
     });
@@ -204,16 +226,16 @@ function RunHistory() {
                           </div>
 
                           <p className="mt-1 text-sm text-gray-500">
-                            {formatRunDate(run.date)}
-                            {formatRunTime(run.date)
-                              ? ` • ${formatRunTime(run.date)}`
+                            {formatRunDate(run.date || run.createdAt)}
+                            {formatRunTime(run.date || run.createdAt)
+                              ? ` • ${formatRunTime(run.date || run.createdAt)}`
                               : ""}
                           </p>
                         </div>
                       </div>
 
                       {/* Run stats */}
-                      <div className="grid grid-cols-2 gap-6 sm:grid-cols-4 lg:min-w-[520px]">
+                      <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:min-w-[600px] lg:grid-cols-5">
                         <div>
                           <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
                             Distance
@@ -251,6 +273,16 @@ function RunHistory() {
 
                           <p className="mt-1 font-bold text-gray-900">
                             {Number(run.maxSpeed || 0).toFixed(1)} km/h
+                          </p>
+                        </div>
+
+                        <div>
+                          <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+                            Estimated Calories
+                          </p>
+
+                          <p className="mt-1 font-bold text-gray-900">
+                            {formatEstimatedCalories(run)}
                           </p>
                         </div>
                       </div>

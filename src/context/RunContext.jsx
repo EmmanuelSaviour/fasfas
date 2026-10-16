@@ -1,3 +1,4 @@
+
 import {
   createContext,
   useContext,
@@ -162,10 +163,6 @@ export function RunProvider({
     let cancelled = false;
 
     async function loadRuns() {
-      /*
-       * No logged-in user means there
-       * are no runs to load.
-       */
       if (
         !isAuthenticated ||
         !user?.id
@@ -304,6 +301,15 @@ export function RunProvider({
       try {
         setError("");
 
+        const distance =
+          Math.max(
+            0,
+            Number(runData.distance) || 0
+          );
+
+        const estimatedCalories =
+          distance * 70;
+
         const response =
           await fetch(
             `${API_URL}/api/users/${user.id}/runs`,
@@ -315,34 +321,24 @@ export function RunProvider({
                   "application/json",
               },
 
-              body: JSON.stringify({
-                distance:
-                  Number(
-                    runData.distance
-                  ) || 0,
 
-                duration:
-                  Number(
-                    runData.duration
-                  ) || 0,
+body: JSON.stringify({
+  distance,
+  estimatedCalories,
+  duration: Number(runData.duration) || 0,
+  gpsPoints: Number(runData.gpsPoints) || 0,
+  maxSpeed: Number(runData.maxSpeed) || 0,
+  cadence:
+    Number.isFinite(Number(runData.cadence)) &&
+    runData.cadence !== null &&
+    runData.cadence !== ""
+      ? Math.round(Number(runData.cadence))
+      : null,
+  route: Array.isArray(runData.route)
+    ? runData.route
+    : [],
+}),
 
-                gpsPoints:
-                  Number(
-                    runData.gpsPoints
-                  ) || 0,
-
-                maxSpeed:
-                  Number(
-                    runData.maxSpeed
-                  ) || 0,
-
-                route:
-                  Array.isArray(
-                    runData.route
-                  )
-                    ? runData.route
-                    : [],
-              }),
             }
           );
 

@@ -366,8 +366,7 @@ function Runs() {
 
                     {/* Stats */}
 
-                    <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-5">
                       {/* Distance */}
 
                       <div className="rounded-2xl bg-gray-50 p-4">
@@ -415,20 +414,47 @@ function Runs() {
 
                       {/* Max Speed */}
 
-                      <div className="rounded-2xl bg-gray-50 p-4">
+                <div className="rounded-2xl bg-gray-50 p-4">
+             <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+               Max Speed
+             </p>
 
-                        <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
-                          Max Speed
-                        </p>
+            <p className="mt-1 text-lg font-bold text-gray-900">
+    {Number(run.maxSpeed || 0).toFixed(1)}
+    <span className="ml-1 text-sm font-semibold text-gray-500">
+      km/h
+    </span>
+  </p>
+</div>
 
-                        <p className="mt-1 text-lg font-bold text-gray-900">
-                          {Number(run.maxSpeed || 0).toFixed(1)}
-                          <span className="ml-1 text-sm font-semibold text-gray-500">
-                            km/h
-                          </span>
-                        </p>
+{/* Estimated Calories */}
+<div className="rounded-2xl bg-gray-50 p-4">
+  <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+    Estimated Calories
+  </p>
 
-                      </div>
+  <p className="mt-1 text-lg font-bold text-gray-900">
+    {Number(run.estimatedCalories) > 0
+      ? `${Math.round(Number(run.estimatedCalories))} kcal`
+      : "—"}
+  </p>
+</div>
+
+
+{/* Cadence */}
+<div className="rounded-2xl bg-gray-50 p-4">
+  <p className="text-xs font-medium uppercase tracking-wide text-gray-400">
+    Cadence
+  </p>
+
+  <p className="mt-1 text-lg font-bold text-gray-900">
+    {Number(run.cadence) > 0
+      ? `${Math.round(Number(run.cadence))} steps/min`
+      : "—"}
+  </p>
+</div>
+
+
 
                     </div>
 
