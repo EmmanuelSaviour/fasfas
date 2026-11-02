@@ -750,9 +750,9 @@ function Run() {
                 ? accuracy
                 : null;
 
-            if (currentAccuracy === null || currentAccuracy > 20) {
-              return;
-            }
+              if (currentAccuracy === null) {
+                return;
+              }
 
             setGpsAccuracy(
               currentAccuracy
