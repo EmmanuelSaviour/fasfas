@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 import Navbar from "../components/layout/Navbar";
+import NearbyRunners from "../components/community/NearbyRunners";
+
 
 function Community() {
   return (
@@ -104,6 +106,9 @@ function Community() {
 
         </div>
       </section>
+
+      {/* Nearby Runners */}
+          <NearbyRunners />
 
       {/* Community Values */}
       <section className="bg-gray-50 px-6 py-20">

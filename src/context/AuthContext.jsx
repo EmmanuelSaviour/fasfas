@@ -33,8 +33,47 @@ function getStoredUser() {
       "fasfas_user"
     );
 
+    localStorage.removeItem(
+      "fasfas_token"
+    );
+
+    localStorage.removeItem(
+      "fasfas_authenticated"
+    );
+
     return null;
   }
+}
+
+/*
+ * ================================
+ * Store Authentication
+ * ================================
+ */
+
+function storeAuthentication(data) {
+  if (!data?.user || !data?.token) {
+    throw new Error(
+      "Authentication succeeded without a user or token. Please try logging in again."
+    );
+  }
+
+  localStorage.setItem(
+    "fasfas_token",
+    data.token
+  );
+
+  localStorage.setItem(
+    "fasfas_user",
+    JSON.stringify(
+      data.user
+    )
+  );
+
+  localStorage.setItem(
+    "fasfas_authenticated",
+    "true"
+  );
 }
 
 /*
@@ -95,23 +134,7 @@ export function AuthProvider({
       );
     }
 
-    /*
-     * Store only the safe user
-     * information returned by
-     * the backend.
-     */
-
-    localStorage.setItem(
-      "fasfas_user",
-      JSON.stringify(
-        data.user
-      )
-    );
-
-    localStorage.setItem(
-      "fasfas_authenticated",
-      "true"
-    );
+    storeAuthentication(data);
 
     setUser(data.user);
 
@@ -159,25 +182,7 @@ export function AuthProvider({
       );
     }
 
-    /*
-     * Store the authenticated
-     * user.
-     *
-     * The backend never sends
-     * passwordHash.
-     */
-
-    localStorage.setItem(
-      "fasfas_user",
-      JSON.stringify(
-        data.user
-      )
-    );
-
-    localStorage.setItem(
-      "fasfas_authenticated",
-      "true"
-    );
+    storeAuthentication(data);
 
     setUser(data.user);
 
@@ -201,6 +206,17 @@ export function AuthProvider({
       );
     }
 
+    const token =
+      localStorage.getItem(
+        "fasfas_token"
+      );
+
+    if (!token) {
+      throw new Error(
+        "Your session has expired. Please log in again."
+      );
+    }
+
     const response =
       await fetch(
         `${API_URL}/api/users/${user.id}/profile`,
@@ -210,6 +226,9 @@ export function AuthProvider({
           headers: {
             "Content-Type":
               "application/json",
+
+            Authorization:
+              `Bearer ${token}`,
           },
 
           body: JSON.stringify({
@@ -233,17 +252,7 @@ export function AuthProvider({
       );
     }
 
-    /*
-     * Update React state.
-     */
-
     setUser(data.user);
-
-    /*
-     * Update stored user so
-     * the changes remain after
-     * refreshing the page.
-     */
 
     localStorage.setItem(
       "fasfas_user",
@@ -262,42 +271,21 @@ export function AuthProvider({
    */
 
   const logout = () => {
-    /*
-     * Remove authentication.
-     */
-
     localStorage.removeItem(
       "fasfas_authenticated"
     );
-
-    /*
-     * Remove stored user.
-     */
 
     localStorage.removeItem(
       "fasfas_user"
     );
 
-    /*
-     * IMPORTANT:
-     *
-     * Remove any temporary
-     * active run when the
-     * runner logs out.
-     *
-     * This prevents a run from
-     * today being restored when
-     * the user logs back in.
-     */
+    localStorage.removeItem(
+      "fasfas_token"
+    );
 
     localStorage.removeItem(
       "fasfas_active_run"
     );
-
-    /*
-     * Clear React authentication
-     * state.
-     */
 
     setUser(null);
   };

@@ -1,16 +1,33 @@
+
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import ConsistencyTree from "../components/ui/ConsistencyTree";
 import API_URL from "../config/api";
+import { useAuth } from "../context/AuthContext";
 
 function CommunityForest() {
+  const { isAuthenticated } = useAuth();
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedCard, setSelectedCard] = useState(null);
 
   useEffect(() => {
+    // Never load or display community members for logged-out visitors.
+    if (!isAuthenticated) {
+      setUsers([]);
+      setLoading(false);
+      setError("");
+      return;
+    }
+
+    let cancelled = false;
+
     const fetchCommunity = async () => {
+      setLoading(true);
+      setError("");
+
       try {
         const response = await fetch(`${API_URL}/api/community`);
         const data = await response.json();
@@ -21,19 +38,100 @@ function CommunityForest() {
           );
         }
 
-        setUsers(data.users || []);
+        if (!cancelled) {
+          setUsers(data.users || []);
+        }
       } catch (err) {
         console.error("COMMUNITY FOREST ERROR:", err);
-        setError(
-          err.message || "Unable to load Community Forest."
-        );
+
+        if (!cancelled) {
+          setError(
+            err.message || "Unable to load Community Forest."
+          );
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
     };
 
     fetchCommunity();
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated]);
+
+  // Signup gate: visitors must authenticate before seeing the forest.
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="border-b border-gray-200 bg-white">
+          <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+            <Link
+              to="/community"
+              className="text-sm font-semibold text-emerald-600 transition hover:text-emerald-700"
+            >
+              ← Back to Community
+            </Link>
+
+            <Link
+              to="/"
+              className="text-xl font-bold text-emerald-600"
+            >
+              FasFas
+            </Link>
+          </div>
+        </header>
+
+        <main className="flex min-h-[calc(100vh-73px)] items-center justify-center px-6 py-12">
+          <section className="w-full max-w-xl rounded-3xl border border-emerald-100 bg-white p-8 text-center shadow-lg sm:p-12">
+            <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-emerald-50 text-6xl">
+              🌱
+            </div>
+
+            <p className="mt-6 text-sm font-bold uppercase tracking-[0.2em] text-emerald-600">
+              Your journey starts here
+            </p>
+
+            <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+              Plant Your Tree
+            </h1>
+
+            <p className="mt-5 leading-relaxed text-gray-600">
+              Every runner has a tree. Every tree tells a story.
+              Join FasFas, plant your tree, and grow alongside a
+              community that celebrates consistency and progress.
+            </p>
+
+            <Link
+              to="/register"
+              state={{ from: "/community/forest" }}
+              className="mt-8 inline-flex w-full items-center justify-center rounded-xl bg-emerald-600 px-6 py-4 font-bold text-white shadow-md transition hover:bg-emerald-700 sm:w-auto"
+            >
+              🌳 Plant Your Tree — Sign Up
+            </Link>
+
+            <p className="mt-6 text-sm text-gray-500">
+              Already a member?{" "}
+              <Link
+                to="/login"
+                state={{ from: "/community/forest" }}
+                className="font-bold text-emerald-700 underline underline-offset-4 hover:text-emerald-800"
+              >
+                Log in to enter the forest
+              </Link>
+            </p>
+
+            <p className="mt-5 text-xs text-gray-400">
+              Your community forest awaits.
+            </p>
+          </section>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -141,13 +239,11 @@ function CommunityForest() {
                       : ""
                   }`}
                 >
-                  {/* Consistency Tree */}
                   <ConsistencyTree
                     verifiedRuns={user.verifiedRuns}
                     compact={true}
                   />
 
-                  {/* Runner Information */}
                   <div className="border-t border-gray-100 px-6 py-5">
                     <div className="flex items-center justify-between gap-3">
                       <h2 className="truncate text-lg font-bold text-gray-900">

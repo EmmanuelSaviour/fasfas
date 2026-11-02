@@ -1,12 +1,17 @@
+
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Link,
+  useLocation,
+  useNavigate,
+} from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/logos/fasfas-logo.png";
-import API_URL from "../config/api";
 
 function Register() {
-  const { login } = useAuth();
+  const { register } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -49,41 +54,23 @@ function Register() {
     try {
       setLoading(true);
 
-      const response = await fetch(
-        `${API_URL}/api/users`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: name.trim(),
-            email: email.trim().toLowerCase(),
-            password,
-          }),
-        }
-      );
+      await register({
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        password,
+      });
 
-      const data = await response.json();
+      const destination =
+        location.state?.from === "/community/forest"
+          ? "/community/forest"
+          : "/dashboard";
 
-      if (!response.ok || !data.success) {
-        throw new Error(
-          data.message || "Unable to create user."
-        );
-      }
-
-      /*
-       * Store the authenticated user.
-       */
-      login(data.user);
-
-      navigate("/dashboard");
+      navigate(destination, { replace: true });
     } catch (registerError) {
       console.error("Registration error:", registerError);
 
       setError(
-        registerError.message ||
-          "Unable to create user."
+        registerError.message || "Unable to create user."
       );
     } finally {
       setLoading(false);
@@ -92,14 +79,10 @@ function Register() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-blue-50 px-6 py-12">
-
       <div className="mx-auto flex min-h-[80vh] max-w-md items-center justify-center">
-
         <div className="w-full">
-
           {/* Brand */}
           <div className="mb-8 text-center">
-
             <Link
               to="/"
               className="inline-flex items-center justify-center"
@@ -118,17 +101,14 @@ function Register() {
             <p className="mt-2 text-gray-600">
               Plant your tree and start growing.
             </p>
-
           </div>
 
           {/* Register Card */}
           <div className="rounded-3xl border border-gray-100 bg-white p-8 shadow-xl md:p-10">
-
             <form
               className="space-y-5"
               onSubmit={handleRegister}
             >
-
               {/* Error */}
               {error && (
                 <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-medium text-red-600">
@@ -234,12 +214,10 @@ function Register() {
                   ? "🌱 Planting your tree..."
                   : "🌱 Plant Your Tree"}
               </button>
-
             </form>
 
             {/* Login */}
             <div className="mt-8 border-t border-gray-100 pt-6 text-center">
-
               <p className="text-sm text-gray-600">
                 Already have a FasFas account?
               </p>
@@ -250,27 +228,20 @@ function Register() {
               >
                 Continue growing →
               </Link>
-
             </div>
-
           </div>
 
           {/* Back Home */}
           <div className="mt-6 text-center">
-
             <Link
               to="/"
               className="text-sm font-medium text-gray-500 transition hover:text-emerald-600"
             >
               ← Back to FasFas
             </Link>
-
           </div>
-
         </div>
-
       </div>
-
     </main>
   );
 }

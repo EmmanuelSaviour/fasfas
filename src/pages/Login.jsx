@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import logo from "../assets/logos/fasfas-logo.png";
 
 function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -36,7 +37,11 @@ function Login() {
         password
       );
 
-      navigate("/dashboard");
+      const destination = location.state?.from === "/community/forest"
+        ? "/community/forest"
+        : "/dashboard";
+
+      navigate(destination, { replace: true });
     } catch (loginError) {
       console.error("Login error:", loginError);
 

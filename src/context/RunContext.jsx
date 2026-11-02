@@ -1,4 +1,3 @@
-
 import {
   createContext,
   useContext,
@@ -176,9 +175,26 @@ export function RunProvider({
         setLoading(true);
         setError("");
 
+        const token =
+          localStorage.getItem(
+            "fasfas_token"
+          );
+
+        if (!token) {
+          throw new Error(
+            "Your session has expired. Please log in again."
+          );
+        }
+
         const response =
           await fetch(
-            `${API_URL}/api/users/${user.id}/runs`
+            `${API_URL}/api/users/${user.id}/runs`,
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`,
+              },
+            }
           );
 
         const data =
@@ -301,6 +317,17 @@ export function RunProvider({
       try {
         setError("");
 
+        const token =
+          localStorage.getItem(
+            "fasfas_token"
+          );
+
+        if (!token) {
+          throw new Error(
+            "Your session has expired. Please log in again."
+          );
+        }
+
         const distance =
           Math.max(
             0,
@@ -319,26 +346,35 @@ export function RunProvider({
               headers: {
                 "Content-Type":
                   "application/json",
+
+                Authorization:
+                  `Bearer ${token}`,
               },
 
-
-body: JSON.stringify({
-  distance,
-  estimatedCalories,
-  duration: Number(runData.duration) || 0,
-  gpsPoints: Number(runData.gpsPoints) || 0,
-  maxSpeed: Number(runData.maxSpeed) || 0,
-  cadence:
-    Number.isFinite(Number(runData.cadence)) &&
-    runData.cadence !== null &&
-    runData.cadence !== ""
-      ? Math.round(Number(runData.cadence))
-      : null,
-  route: Array.isArray(runData.route)
-    ? runData.route
-    : [],
-}),
-
+              body: JSON.stringify({
+                distance,
+                estimatedCalories,
+                duration:
+                  Number(runData.duration) || 0,
+                gpsPoints:
+                  Number(runData.gpsPoints) || 0,
+                maxSpeed:
+                  Number(runData.maxSpeed) || 0,
+                cadence:
+                  Number.isFinite(
+                    Number(runData.cadence)
+                  ) &&
+                  runData.cadence !== null &&
+                  runData.cadence !== ""
+                    ? Math.round(
+                        Number(runData.cadence)
+                      )
+                    : null,
+                route:
+                  Array.isArray(runData.route)
+                    ? runData.route
+                    : [],
+              }),
             }
           );
 
@@ -399,9 +435,26 @@ body: JSON.stringify({
         setLoading(true);
         setError("");
 
+        const token =
+          localStorage.getItem(
+            "fasfas_token"
+          );
+
+        if (!token) {
+          throw new Error(
+            "Your session has expired. Please log in again."
+          );
+        }
+
         const response =
           await fetch(
-            `${API_URL}/api/users/${user.id}/runs`
+            `${API_URL}/api/users/${user.id}/runs`,
+            {
+              headers: {
+                Authorization:
+                  `Bearer ${token}`,
+              },
+            }
           );
 
         const data =
